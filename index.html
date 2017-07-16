@@ -1,0 +1,66 @@
+<body>
+     <input type="radio" name="fileExtIn" value="json" id="json">.json
+     <input type="radio" name="fileExtIn" value="xml" id="xml">.xml
+     <br><br>
+     <input type="file" id="myFile" name="fileIn" accept=".csv, .json, .xml , .xlxs" required  >
+     <button onclick="convert()">convert</button>
+     <script src="json2xml.js"></script>
+     
+     <div id="cFile"></div>
+    
+    <script>
+      
+      function downloadInnerHtml(filename, elId, mimeType) {
+        var elHtml = document.getElementById(elId).innerHTML;
+        var link = document.createElement('a');
+        mimeType = mimeType || 'text/json';
+
+        link.setAttribute('download', filename);
+        link.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(elHtml));
+        link.click();
+      }
+
+
+     
+      var myfile = document.getElementById("myFile");
+      var cFile = document.getElementById("cFile");
+      cFile.innerHTML = "";
+      cFile.style.visibility = 'hidden';
+      function convert() {
+
+        var reader = new FileReader();
+
+        reader.onload = function(e){
+          
+            var data = e.target.result;
+          
+            if(document.getElementById('xml').checked === true)
+            {
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(data,"text/xml");
+                
+                var obj1=xml2json(xmlDoc);
+                
+                obj1 = obj1.replace("undefined", "");
+                cFile.innerHTML=obj1;
+                downloadInnerHtml('toJson.json', 'cFile', 'text/json') ;
+            }
+            else
+            {
+                var objJ=JSON.parse(data);
+                var xml2 = json2xml(objJ);
+                cFile.innerHTML=xml2;
+                downloadInnerHtml('toXml.xml', 'cFile', 'text/xml') ;
+            }
+          
+          };
+
+        reader.onerror = function(e){
+            console.log(e);
+          };
+
+        reader.readAsText(myfile.files[0]);
+      }
+     
+    </script>
+</body>
